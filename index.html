@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ভিডিও লার্নিং প্ল্যাটফর্ম</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-base: #0a0c10;
+    --bg-surface: #111318;
+    --bg-card: #181c24;
+    --bg-hover: #1e2330;
+    --bg-active: #1a2340;
+    --accent: #4f8ef7;
+    --accent-glow: rgba(79,142,247,0.18);
+    --accent2: #a78bfa;
+    --text-primary: #e8eaf0;
+    --text-secondary: #8b92a8;
+    --text-muted: #50576b;
+    --border: rgba(255,255,255,0.07);
+    --border-active: rgba(79,142,247,0.4);
+    --radius: 12px;
+    --sidebar-w: 300px;
+    --header-h: 58px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Hind Siliguri', sans-serif;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    height: var(--header-h);
+    background: rgba(10,12,16,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 12px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.3px;
+  }
+
+  .logo-icon {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+  }
+
+  .header-search {
+    flex: 1;
+    max-width: 320px;
+    margin-left: auto;
+    position: relative;
+  }
+
+  .header-search input {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px 7px 36px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .header-search input:focus { border-color: var(--border-active); }
+  .header-search input::placeholder { color: var(--text-muted); }
+
+  .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  /* ── LAYOUT ── */
+  .app-body {
+    display: flex;
+    height: calc(100vh - var(--header-h));
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  aside {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-title {
+    padding: 18px 18px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .subject-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 0 10px 16px;
+  }
+
+  .subject-list::-webkit-scrollbar { width: 4px; }
+  .subject-list::-webkit-scrollbar-track { background: transparent; }
+  .subject-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .subject-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-align: left;
+    transition: all 0.18s;
+    margin-bottom: 2px;
+  }
+
+  .subject-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .subject-btn.active {
+    background: var(--bg-active);
+    color: var(--accent);
+    border: 1px solid var(--border-active);
+  }
+
+  .subject-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .subject-meta {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .subject-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .subject-count {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-top: 1px;
+  }
+
+  .subject-btn.active .subject-count { color: rgba(79,142,247,0.6); }
+
+  /* ── VIDEO LIST ── */
+  .video-list-panel {
+    width: 280px;
+    min-width: 280px;
+    background: var(--bg-base);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-subject-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .panel-video-count {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  .video-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 10px;
+  }
+
+  .video-list::-webkit-scrollbar { width: 4px; }
+  .video-list::-webkit-scrollbar-track { background: transparent; }
+  .video-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .video-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 9px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.18s;
+    margin-bottom: 4px;
+    align-items: flex-start;
+  }
+
+  .video-item:hover { background: var(--bg-card); border-color: var(--border); }
+  .video-item.active { background: var(--bg-active); border-color: var(--border-active); }
+
+  .video-thumb {
+    width: 80px;
+    height: 48px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    background: var(--bg-card);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .video-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .play-badge {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-radius: 6px;
+  }
+
+  .video-item:hover .play-badge,
+  .video-item.active .play-badge { opacity: 1; }
+
+  .play-badge svg { width: 20px; height: 20px; }
+
+  .video-info { flex: 1; min-width: 0; }
+
+  .video-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--text-primary);
+  }
+
+  .video-item.active .video-title { color: var(--accent); }
+
+  .video-duration {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── PREVIEW PANEL ── */
+  .preview-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-base);
+  }
+
+  .preview-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--text-muted);
+    padding: 40px;
+  }
+
+  .preview-empty-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px dashed var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .preview-empty p { font-size: 0.9rem; text-align: center; }
+
+  .preview-video-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .video-frame-container {
+    width: 100%;
+    position: relative;
+    background: #000;
+    aspect-ratio: 16/9;
+    max-height: 55vh;
+  }
+
+  .video-frame-container iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .preview-info {
+    padding: 20px 24px;
+    border-top: 1px solid var(--border);
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .preview-info::-webkit-scrollbar { width: 4px; }
+  .preview-info::-webkit-scrollbar-track { background: transparent; }
+  .preview-info::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .preview-subject-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--accent-glow);
+    border: 1px solid rgba(79,142,247,0.3);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .preview-video-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+
+  .preview-video-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .meta-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .preview-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  /* ── MOBILE OVERLAY ── */
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.22s ease;
+  }
+
+  .mobile-overlay.open { display: flex; align-items: flex-end; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .mobile-popup {
+    width: 100%;
+    background: var(--bg-surface);
+    border-radius: 20px 20px 0 0;
+    border-top: 1px solid var(--border);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.28s cubic-bezier(.17,.67,.25,1.1);
+    overflow: hidden;
+  }
+
+  .popup-drag {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 10px auto 14px;
+    flex-shrink: 0;
+  }
+
+  .popup-close-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 12px;
+    flex-shrink: 0;
+  }
+
+  .popup-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    flex: 1;
+    padding-right: 10px;
+    line-height: 1.3;
+  }
+
+  .popup-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .popup-video {
+    aspect-ratio: 16/9;
+    background: #000;
+    flex-shrink: 0;
+  }
+
+  .popup-video iframe { width: 100%; height: 100%; border: none; }
+
+  .popup-body {
+    padding: 14px 16px 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .popup-body::-webkit-scrollbar { width: 3px; }
+  .popup-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .popup-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px; }
+  .popup-desc { font-size: 0.87rem; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ── MOBILE LAYOUT ── */
+  @media (max-width: 768px) {
+    .video-list-panel, aside { display: none; }
+
+    .preview-panel { display: none; }
+
+    .app-body {
+      flex-direction: column;
+      height: auto;
+      overflow: auto;
+    }
+
+    .mobile-main {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-height: calc(100vh - var(--header-h));
+    }
+
+    .mobile-subjects {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .mobile-section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .mobile-subject-pills {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .mobile-subject-pills::-webkit-scrollbar { display: none; }
+
+    .mobile-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      transition: all 0.18s;
+      font-family: inherit;
+    }
+
+    .mobile-pill.active {
+      background: var(--bg-active);
+      border-color: var(--border-active);
+      color: var(--accent);
+    }
+
+    .mobile-video-grid {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .mobile-video-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .mobile-video-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-2px);
+    }
+
+    .mobile-thumb {
+      aspect-ratio: 16/9;
+      background: var(--bg-hover);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mobile-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .mobile-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-play-circle {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-play-circle svg { width: 14px; height: 14px; fill: #000; margin-left: 2px; }
+
+    .mobile-card-info { padding: 8px 10px 10px; }
+
+    .mobile-card-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .mobile-card-dur {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+  }
+
+  @media (min-width: 769px) {
+    .mobile-main { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">▶</div>
+    <span>বিদ্যা<span style="color:var(--accent)">Hub</span></span>
+  </a>
+  <div class="header-search">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="ভিডিও খুঁজুন...">
+  </div>
+</header>
+
+<!-- DESKTOP LAYOUT -->
+<div class="app-body">
+
+  <!-- SIDEBAR: Subjects -->
+  <aside>
+    <div class="sidebar-title">বিষয়সমূহ</div>
+    <div class="subject-list" id="subjectList"></div>
+  </aside>
+
+  <!-- VIDEO LIST -->
+  <div class="video-list-panel">
+    <div class="panel-header">
+      <div class="panel-subject-name" id="panelSubjectName">গণিত</div>
+      <div class="panel-video-count" id="panelVideoCount">৮টি ভিডিও</div>
+    </div>
+    <div class="video-list" id="videoList"></div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-panel" id="previewPanel">
+    <div class="preview-empty" id="previewEmpty">
+      <div class="preview-empty-icon">▶</div>
+      <p>বাম থেকে একটি ভিডিও সিলেক্ট করুন<br>প্রিভিউ এখানে দেখাবে</p>
+    </div>
+    <div class="preview-video-wrap" id="previewContent" style="display:none;">
+      <div class="video-frame-container">
+        <iframe id="desktopIframe" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+      </div>
+      <div class="preview-info">
+        <div class="preview-subject-tag" id="previewTag">📐 গণিত</div>
+        <div class="preview-video-title" id="previewTitle">—</div>
+        <div class="preview-video-meta">
+          <span class="meta-chip">⏱ <span id="previewDur">—</span></span>
+          <span class="meta-chip">👁 <span id="previewViews">—</span></span>
+        </div>
+        <div class="preview-desc" id="previewDesc">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE MAIN -->
+  <div class="mobile-main">
+    <div class="mobile-subjects">
+      <div class="mobile-section-title">বিষয় বেছে নিন</div>
+      <div class="mobile-subject-pills" id="mobilePills"></div>
+    </div>
+    <div class="mobile-video-grid" id="mobileGrid"></div>
+  </div>
+
+</div>
+
+<!-- MOBILE POPUP -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobilePopup(event)">
+  <div class="mobile-popup">
+    <div class="popup-drag"></div>
+    <div class="popup-close-row">
+      <div class="popup-title" id="popupTitle">—</div>
+      <button class="popup-close" onclick="closeMobilePopupBtn()">✕</button>
+    </div>
+    <div class="popup-video">
+      <iframe id="mobileIframe" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    </div>
+    <div class="popup-body">
+      <div class="popup-meta" id="popupMeta">—</div>
+      <div class="popup-desc" id="popupDesc">—</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  subjects: [
+    { id: 'math',    icon: '📐', color: '#4f8ef7', bg: 'rgba(79,142,247,0.15)',  name: 'গণিত',      count: 5 },
+    { id: 'physics', icon: '⚛️', color: '#a78bfa', bg: 'rgba(167,139,250,0.15)', name: 'পদার্থ',    count: 4 },
+    { id: 'chem',    icon: '🧪', color: '#34d399', bg: 'rgba(52,211,153,0.15)',  name: 'রসায়ন',    count: 4 },
+    { id: 'bio',     icon: '🧬', color: '#fb923c', bg: 'rgba(251,146,60,0.15)',  name: 'জীববিজ্ঞান', count: 3 },
+    { id: 'eng',     icon: '🔤', color: '#f472b6', bg: 'rgba(244,114,182,0.15)', name: 'ইংরেজি',    count: 4 },
+    { id: 'ict',     icon: '💻', color: '#22d3ee', bg: 'rgba(34,211,238,0.15)',  name: 'তথ্যপ্রযুক্তি', count: 5 },
+    { id: 'hist',    icon: '📜', color: '#fbbf24', bg: 'rgba(251,191,36,0.15)',  name: 'ইতিহাস',    count: 3 },
+    { id: 'geo',     icon: '🌍', color: '#86efac', bg: 'rgba(134,239,172,0.15)', name: 'ভূগোল',     count: 3 },
+  ],
+
+  videos: {
+    math: [
+      { id:'m1', title:'বীজগণিতের মূল ধারণা', dur:'১৪:৩২', views:'২৩ হাজার', yt:'x5Xk6Io2Kek', desc:'বীজগণিতের মূলনীতি এবং চলক, ধ্রুবক ও রাশির সহজ ব্যাখ্যা।' },
+      { id:'m2', title:'সরল সমীকরণ সমাধান', dur:'১৮:০৫', views:'১৮ হাজার', yt:'5VC7tQiDur0', desc:'এক ও দুই চলকের সরল সমীকরণ কিভাবে সমাধান করতে হয়।' },
+      { id:'m3', title:'জ্যামিতি: ত্রিভুজ ও কোণ', dur:'২২:১৫', views:'৩১ হাজার', yt:'dQw4w9WgXcQ', desc:'ত্রিভুজের বৈশিষ্ট্য, কোণের পরিমাপ এবং পিথাগোরাসের সূত্র।' },
+      { id:'m4', title:'পরিসংখ্যান বেসিক', dur:'১৬:৪৮', views:'১৫ হাজার', yt:'dQw4w9WgXcQ', desc:'গড়, মধ্যক ও প্রচুরক নির্ণয়ের পদ্ধতি।' },
+      { id:'m5', title:'শতকরা হিসাব', dur:'১২:২২', views:'২৭ হাজার', yt:'dQw4w9WgXcQ', desc:'দৈনন্দিন জীবনে শতকরার প্রয়োগ এবং সহজ কৌশল।' },
+    ],
+    physics: [
+      { id:'p1', title:'নিউটনের গতিসূত্র', dur:'২০:১০', views:'৪১ হাজার', yt:'dQw4w9WgXcQ', desc:'নিউটনের তিনটি গতিসূত্র এবং বাস্তব উদাহরণ।' },
+      { id:'p2', title:'মাধ্যাকর্ষণ শক্তি', dur:'১৭:৩৩', views:'২৮ হাজার', yt:'dQw4w9WgXcQ', desc:'মহাকর্ষ বল, ওজন ও ভর-এর মধ্যে পার্থক্য।' },
+      { id:'p3', title:'আলোর প্রতিফলন', dur:'১৫:৫৫', views:'১৯ হাজার', yt:'dQw4w9WgXcQ', desc:'সমতল ও গোলীয় দর্পণে আলোর প্রতিফলনের নিয়ম।' },
+      { id:'p4', title:'বিদ্যুৎ ও চুম্বক', dur:'২৩:০০', views:'৩৫ হাজার', yt:'dQw4w9WgXcQ', desc:'বৈদ্যুতিক প্রবাহ, চুম্বক ক্ষেত্র ও ইলেক্ট্রোম্যাগনেটিজম।' },
+    ],
+    chem: [
+      { id:'c1', title:'পর্যায় সারণি পরিচিতি', dur:'১৯:২০', views:'৩৩ হাজার', yt:'dQw4w9WgXcQ', desc:'মৌলসমূহের পর্যায় সারণি এবং গোষ্ঠী বিভাজন।' },
+      { id:'c2', title:'রাসায়নিক বন্ধন', dur:'২১:৪৫', views:'২৫ হাজার', yt:'dQw4w9WgXcQ', desc:'আয়নিক, সমযোজী ও ধাতব বন্ধনের ধারণা।' },
+      { id:'c3', title:'অ্যাসিড ও ক্ষার', dur:'১৪:১০', views:'২২ হাজার', yt:'dQw4w9WgXcQ', desc:'pH স্কেল, অ্যাসিড-ক্ষার প্রশমন বিক্রিয়া।' },
+      { id:'c4', title:'জৈব রসায়ন বেসিক', dur:'২৫:৩০', views:'১৭ হাজার', yt:'dQw4w9WgXcQ', desc:'হাইড্রোকার্বন ও কার্বন যৌগের মূল ধারণা।' },
+    ],
+    bio: [
+      { id:'b1', title:'কোষ বিভাজন', dur:'১৮:০০', views:'২৯ হাজার', yt:'dQw4w9WgXcQ', desc:'মাইটোসিস ও মিয়োসিস কোষ বিভাজনের পর্যায়সমূহ।' },
+      { id:'b2', title:'জিনেটিক্স ও বংশগতি', dur:'২২:৩৫', views:'২১ হাজার', yt:'dQw4w9WgXcQ', desc:'মেন্ডেলের সূত্র এবং বংশগতির আধুনিক ধারণা।' },
+      { id:'b3', title:'সালোকসংশ্লেষণ', dur:'১৬:৫০', views:'৩৮ হাজার', yt:'dQw4w9WgXcQ', desc:'উদ্ভিদের খাদ্য তৈরির প্রক্রিয়া ও প্রয়োজনীয় উপাদান।' },
+    ],
+    eng: [
+      { id:'e1', title:'Grammar: Tense মাস্টারি', dur:'২০:০০', views:'৪৫ হাজার', yt:'dQw4w9WgXcQ', desc:'ইংরেজির ১২টি Tense সহজ নিয়মে শেখার পদ্ধতি।' },
+      { id:'e2', title:'Vocabulary Building', dur:'১৫:২২', views:'৩২ হাজার', yt:'dQw4w9WgXcQ', desc:'দৈনন্দিন ইংরেজি শব্দভাণ্ডার বাড়ানোর কৌশল।' },
+      { id:'e3', title:'Writing Skills', dur:'১৮:৪০', views:'১৮ হাজার', yt:'dQw4w9WgXcQ', desc:'Paragraph ও Essay লেখার সঠিক পদ্ধতি।' },
+      { id:'e4', title:'Speaking Practice', dur:'২৩:১৫', views:'৫১ হাজার', yt:'dQw4w9WgXcQ', desc:'ইংরেজিতে কথা বলার আত্মবিশ্বাস তৈরির উপায়।' },
+    ],
+    ict: [
+      { id:'i1', title:'HTML ও CSS বেসিক', dur:'২৮:১০', views:'৫৮ হাজার', yt:'dQw4w9WgXcQ', desc:'ওয়েব পেজ তৈরির মূল ভাষা HTML ও CSS-এর প্রাথমিক ধারণা।' },
+      { id:'i2', title:'Python প্রোগ্রামিং', dur:'৩২:৪৫', views:'৪৩ হাজার', yt:'dQw4w9WgXcQ', desc:'Python দিয়ে প্রোগ্রামিং শেখার শুরু — ভেরিয়েবল, লুপ ও ফাংশন।' },
+      { id:'i3', title:'ডেটা ও নেটওয়ার্ক', dur:'১৯:৩০', views:'২৬ হাজার', yt:'dQw4w9WgXcQ', desc:'কম্পিউটার নেটওয়ার্ক, ইন্টারনেট ও ডেটা ট্রান্সমিশন।' },
+      { id:'i4', title:'সাইবার নিরাপত্তা', dur:'২৪:০০', views:'৩৭ হাজার', yt:'dQw4w9WgXcQ', desc:'অনলাইনে নিরাপদ থাকার উপায় ও সাইবার আক্রমণ প্রতিরোধ।' },
+      { id:'i5', title:'ডেটাবেজ পরিচিতি', dur:'২১:১৫', views:'১৯ হাজার', yt:'dQw4w9WgXcQ', desc:'SQL ডেটাবেজের মূল ধারণা ও সহজ কুয়েরি লেখা।' },
+    ],
+    hist: [
+      { id:'h1', title:'বাংলাদেশের মুক্তিযুদ্ধ', dur:'৩০:০০', views:'৭২ হাজার', yt:'dQw4w9WgXcQ', desc:'১৯৭১ সালের স্বাধীনতা যুদ্ধের ঐতিহাসিক পটভূমি ও ঘটনাপ্রবাহ।' },
+      { id:'h2', title:'মুঘল সাম্রাজ্য', dur:'২৫:৩০', views:'৩৩ হাজার', yt:'dQw4w9WgXcQ', desc:'মুঘল সাম্রাজ্যের উত্থান, বিস্তার ও পতনের ইতিহাস।' },
+      { id:'h3', title:'বিশ্বযুদ্ধ পরিচিতি', dur:'২২:০০', views:'২৮ হাজার', yt:'dQw4w9WgXcQ', desc:'প্রথম ও দ্বিতীয় বিশ্বযুদ্ধের কারণ ও ফলাফল।' },
+    ],
+    geo: [
+      { id:'g1', title:'বাংলাদেশের ভূপ্রকৃতি', dur:'১৭:৪০', views:'২৪ হাজার', yt:'dQw4w9WgXcQ', desc:'বাংলাদেশের নদ-নদী, পাহাড় ও জলবায়ুর বিস্তারিত বিবরণ।' },
+      { id:'g2', title:'মানচিত্র পাঠ', dur:'১৪:২৫', views:'১৮ হাজার', yt:'dQw4w9WgXcQ', desc:'মানচিত্রের প্রকারভেদ ও প্রতীক পড়ার পদ্ধতি।' },
+      { id:'g3', title:'জলবায়ু পরিবর্তন', dur:'২০:১০', views:'৪১ হাজার', yt:'dQw4w9WgXcQ', desc:'বৈশ্বিক উষ্ণায়ন, কারণ ও বাংলাদেশে এর প্রভাব।' },
+    ],
+  }
+};
+
+let activeSubject = 'math';
+let activeVideoId = null;
+
+function getYTThumb(ytId) {
+  return `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+}
+
+function getYTEmbed(ytId) {
+  return `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+}
+
+// ── BUILD SIDEBAR ──
+function buildSidebar() {
+  const list = document.getElementById('subjectList');
+  list.innerHTML = DATA.subjects.map(s => `
+    <button class="subject-btn ${s.id === activeSubject ? 'active' : ''}"
+      onclick="selectSubject('${s.id}')">
+      <div class="subject-icon" style="background:${s.bg}; color:${s.color}">${s.icon}</div>
+      <div class="subject-meta">
+        <span class="subject-name">${s.name}</span>
+        <span class="subject-count">${s.count}টি ভিডিও</span>
+      </div>
+    </button>
+  `).join('');
+}
+
+function buildMobilePills() {
+  const pills = document.getElementById('mobilePills');
+  pills.innerHTML = DATA.subjects.map(s => `
+    <button class="mobile-pill ${s.id === activeSubject ? 'active' : ''}"
+      onclick="selectSubject('${s.id}', true)" style="${s.id===activeSubject?`border-color:${s.color};color:${s.color}`:''}">
+      ${s.icon} ${s.name}
+    </button>
+  `).join('');
+}
+
+// ── BUILD VIDEO LIST ──
+function buildVideoList(subjectId) {
+  const videos = DATA.videos[subjectId];
+  const sub = DATA.subjects.find(s => s.id === subjectId);
+
+  document.getElementById('panelSubjectName').textContent = sub.name;
+  document.getElementById('panelVideoCount').textContent = `${videos.length}টি ভিডিও`;
+
+  const list = document.getElementById('videoList');
+  list.innerHTML = videos.map(v => `
+    <div class="video-item ${v.id === activeVideoId ? 'active' : ''}"
+      onclick="selectVideo('${subjectId}', '${v.id}')">
+      <div class="video-thumb">
+        <img src="${getYTThumb(v.yt)}" alt="${v.title}" loading="lazy">
+        <div class="play-badge">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+      <div class="video-info">
+        <div class="video-title">${v.title}</div>
+        <div class="video-duration">⏱ ${v.dur}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function buildMobileGrid(subjectId) {
+  const videos = DATA.videos[subjectId];
+  const grid = document.getElementById('mobileGrid');
+  grid.innerHTML = videos.map(v => `
+    <div class="mobile-video-card" onclick="openMobilePopup('${subjectId}','${v.id}')">
+      <div class="mobile-thumb">
+        <img src="${getYTThumb(v.yt)}" alt="${v.title}" loading="lazy">
+        <div class="mobile-play-overlay">
+          <div class="mobile-play-circle">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="mobile-card-info">
+        <div class="mobile-card-title">${v.title}</div>
+        <div class="mobile-card-dur">⏱ ${v.dur}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── SELECT SUBJECT ──
+function selectSubject(subjectId, isMobile = false) {
+  activeSubject = subjectId;
+  activeVideoId = null;
+
+  buildSidebar();
+  buildVideoList(subjectId);
+  buildMobilePills();
+  buildMobileGrid(subjectId);
+
+  // reset preview
+  document.getElementById('previewEmpty').style.display = 'flex';
+  document.getElementById('previewContent').style.display = 'none';
+  document.getElementById('desktopIframe').src = '';
+}
+
+// ── SELECT VIDEO (desktop) ──
+function selectVideo(subjectId, videoId) {
+  activeVideoId = videoId;
+  const sub = DATA.subjects.find(s => s.id === subjectId);
+  const vid = DATA.videos[subjectId].find(v => v.id === videoId);
+
+  buildVideoList(subjectId); // refresh active state
+
+  document.getElementById('previewEmpty').style.display = 'none';
+  document.getElementById('previewContent').style.display = 'flex';
+
+  document.getElementById('desktopIframe').src = getYTEmbed(vid.yt);
+  document.getElementById('previewTag').textContent = `${sub.icon} ${sub.name}`;
+  document.getElementById('previewTitle').textContent = vid.title;
+  document.getElementById('previewDur').textContent = vid.dur;
+  document.getElementById('previewViews').textContent = vid.views + ' ভিউ';
+  document.getElementById('previewDesc').textContent = vid.desc;
+}
+
+// ── MOBILE POPUP ──
+function openMobilePopup(subjectId, videoId) {
+  const sub = DATA.subjects.find(s => s.id === subjectId);
+  const vid = DATA.videos[subjectId].find(v => v.id === videoId);
+
+  document.getElementById('popupTitle').textContent = vid.title;
+  document.getElementById('popupMeta').textContent = `${sub.icon} ${sub.name}  •  ⏱ ${vid.dur}  •  👁 ${vid.views} ভিউ`;
+  document.getElementById('popupDesc').textContent = vid.desc;
+  document.getElementById('mobileIframe').src = getYTEmbed(vid.yt);
+
+  document.getElementById('mobileOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobilePopup(e) {
+  if (e.target === document.getElementById('mobileOverlay')) {
+    closePopupCleanup();
+  }
+}
+
+function closeMobilePopupBtn() {
+  closePopupCleanup();
+}
+
+function closePopupCleanup() {
+  document.getElementById('mobileOverlay').classList.remove('open');
+  document.getElementById('mobileIframe').src = '';
+  document.body.style.overflow = '';
+}
+
+// ── INIT ──
+buildSidebar();
+buildVideoList(activeSubject);
+buildMobilePills();
+buildMobileGrid(activeSubject);
+</script>
+</body>
+</html>
